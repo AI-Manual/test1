@@ -65,6 +65,9 @@ headers:corsHeaders
 
 const apiKey = env.GEMINI_API_KEY;
 
+  console.log(
+  apiKey ? "KEY EXISTS" : "KEY MISSING"
+  );
 
 
 const response = await fetch(
