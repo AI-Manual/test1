@@ -111,7 +111,7 @@ if(!apiKey){
 
 const response = await fetch(
 
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key="
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key="
   + apiKey,
 
   {
