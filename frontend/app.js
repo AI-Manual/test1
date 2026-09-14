@@ -6,51 +6,77 @@ document
 .addEventListener("click", async ()=>{
 
 
- const file =
- document.getElementById("videoFile").files[0];
+  const file =
+    document.getElementById("videoFile").files[0];
 
 
- if(!file){
+  if(!file){
 
-  alert("動画を選択してください");
+    alert("動画を選択してください");
 
-  return;
+    return;
 
- }
-
-
- const formData =
- new FormData();
+  }
 
 
- formData.append(
- "video",
- file
- );
+  const result =
+    document.getElementById("result");
 
 
- const res =
- await fetch(
- API_URL + "/api/analyze",
- {
-  method:"POST",
-  body:formData
- }
- );
+  result.textContent =
+    "解析中...";
 
 
- const data =
- await res.json();
+  try {
 
 
- document
- .getElementById("result")
- .textContent =
- JSON.stringify(
- data,
- null,
- 2
- );
+    const formData =
+      new FormData();
+
+
+    formData.append(
+      "video",
+      file
+    );
+
+
+    const res =
+      await fetch(
+        API_URL + "/api/analyze",
+        {
+          method:"POST",
+          body:formData
+        }
+      );
+
+
+    const data =
+      await res.json();
+
+
+    result.textContent =
+      JSON.stringify(
+        data,
+        null,
+        2
+      );
+
+
+  } catch(error){
+
+
+    result.textContent =
+      JSON.stringify(
+        {
+          success:false,
+          message:error.message
+        },
+        null,
+        2
+      );
+
+
+  }
 
 
 });
