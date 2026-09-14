@@ -5,171 +5,182 @@ async fetch(request, env) {
 
 const corsHeaders = {
 
-"Access-Control-Allow-Origin":"*",
+  "Access-Control-Allow-Origin":"*",
 
-"Access-Control-Allow-Methods":
-"GET, POST, OPTIONS",
+  "Access-Control-Allow-Methods":
+    "GET, POST, OPTIONS",
 
-"Access-Control-Allow-Headers":
-"Content-Type"
+  "Access-Control-Allow-Headers":
+    "Content-Type"
 
 };
 
 
+
 // CORS preflight
+
 if(request.method === "OPTIONS"){
 
-return new Response(null,{
-status:204,
-headers:corsHeaders
-});
+  return new Response(null,{
+    status:204,
+    headers:corsHeaders
+  });
 
 }
 
 
-// GET確認
+
+// GET 動作確認
+
 if(request.method === "GET"){
 
-return new Response(
+  return new Response(
 
-JSON.stringify({
-success:true,
-message:"AI Manual Worker OK"
-}),
+    JSON.stringify({
+      success:true,
+      message:"AI Manual Worker OK"
+    }),
 
-{
-headers:{
-...corsHeaders,
-"content-type":"application/json"
+    {
+      headers:{
+        ...corsHeaders,
+        "content-type":"application/json"
+      }
+    }
+
+  );
+
 }
-}
 
-);
-
-}
 
 
 // POST以外拒否
+
 if(request.method !== "POST"){
 
-return new Response(
+  return new Response(
 
-JSON.stringify({
-success:false,
-message:"Method Not Allowed"
-}),
+    JSON.stringify({
+      success:false,
+      message:"Method Not Allowed"
+    }),
 
-{
-status:405,
-headers:{
-...corsHeaders,
-"content-type":"application/json"
+    {
+      status:405,
+      headers:{
+        ...corsHeaders,
+        "content-type":"application/json"
+      }
+    }
+
+  );
+
 }
-}
-
-);
-
-}
 
 
+
+// Gemini API Key確認
 
 const apiKey = env.GEMINI_API_KEY;
 
 
 if(!apiKey){
 
-return new Response(
+  return new Response(
 
-JSON.stringify({
+    JSON.stringify({
+      success:false,
+      message:"GEMINI_API_KEY missing"
+    }),
 
-success:false,
+    {
+      status:500,
+      headers:{
+        ...corsHeaders,
+        "content-type":"application/json"
+      }
+    }
 
-message:"GEMINI_API_KEY missing"
-
-}),
-
-{
-status:500,
-headers:{
-...corsHeaders,
-"content-type":"application/json"
-}
-}
-
-);
+  );
 
 }
 
 
+
+// Gemini呼び出し
 
 const response = await fetch(
 
-"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key="
-+ apiKey,
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key="
+  + apiKey,
 
-{
+  {
 
-method:"POST",
+    method:"POST",
 
-headers:{
-"Content-Type":"application/json"
-},
+    headers:{
+      "Content-Type":"application/json"
+    },
 
-body:JSON.stringify({
 
-contents:[
+    body:JSON.stringify({
 
-{
+      contents:[
 
-parts:[
+        {
 
-{
+          parts:[
 
-text:
-"AI作業マニュアル解析開始。作業内容を説明してください。"
+            {
 
-}
+              text:
+              "AI作業マニュアル解析開始。作業内容を説明してください。"
 
-]
+            }
 
-}
+          ]
 
-]
+        }
 
-})
+      ]
 
-}
+    })
+
+  }
 
 );
 
 
 
-const data =
-await response.json();
+// Gemini結果
+
+const data = await response.json();
 
 
+
+// 返却
 
 return new Response(
 
-JSON.stringify({
+  JSON.stringify({
 
-success:true,
+    success:true,
 
-data:data
+    data:data
 
-},null,2),
+  },null,2),
 
-{
+  {
 
-headers:{
+    headers:{
 
-...corsHeaders,
+      ...corsHeaders,
 
-"content-type":"application/json"
+      "content-type":"application/json"
 
-}
+    }
 
-}
+  }
 
 );
 
