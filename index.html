@@ -1,82 +1,35 @@
-const API_URL = "https://test1.valhiroyuki.workers.dev";
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>AI作業マニュアル作成</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>AI作業マニュアル作成</h1>
+
+<div>
+  <input type="file" id="videoFile" accept="video/*">
+</div>
+
+<br>
+
+<button id="analyzeBtn">
+解析開始
+</button>
+
+<hr>
+
+<h2>解析結果</h2>
+
+<pre id="result">
+ここに結果表示
+</pre>
 
 
-document
-.getElementById("analyzeBtn")
-.addEventListener("click", async ()=>{
+<script src="app.js"></script>
 
-
-  const file =
-    document.getElementById("videoFile").files[0];
-
-
-  if(!file){
-
-    alert("動画を選択してください");
-
-    return;
-
-  }
-
-
-  const result =
-    document.getElementById("result");
-
-
-  result.textContent =
-    "解析中...";
-
-
-  try {
-
-
-    const formData =
-      new FormData();
-
-
-    formData.append(
-      "video",
-      file
-    );
-
-
-    const res =
-      await fetch(
-        API_URL + "/api/analyze",
-        {
-          method:"POST",
-          body:formData
-        }
-      );
-
-
-    const data =
-      await res.json();
-
-
-    result.textContent =
-      JSON.stringify(
-        data,
-        null,
-        2
-      );
-
-
-  } catch(error){
-
-
-    result.textContent =
-      JSON.stringify(
-        {
-          success:false,
-          message:error.message
-        },
-        null,
-        2
-      );
-
-
-  }
-
-
-});
+</body>
+</html>
