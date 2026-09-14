@@ -20,13 +20,14 @@ const corsHeaders = {
 if(request.method === "OPTIONS"){
 
 return new Response(null,{
+status:204,
 headers:corsHeaders
 });
 
 }
 
 
-
+// GET確認
 if(request.method === "GET"){
 
 return new Response(
@@ -48,15 +49,24 @@ headers:{
 }
 
 
-
+// POST以外拒否
 if(request.method !== "POST"){
 
 return new Response(
-"Method Not Allowed",
+
+JSON.stringify({
+success:false,
+message:"Method Not Allowed"
+}),
+
 {
 status:405,
-headers:corsHeaders
+headers:{
+...corsHeaders,
+"content-type":"application/json"
 }
+}
+
 );
 
 }
@@ -65,15 +75,35 @@ headers:corsHeaders
 
 const apiKey = env.GEMINI_API_KEY;
 
-  console.log(
-  apiKey ? "KEY_EXISTS" : "KEY_MISSING"
+
+if(!apiKey){
+
+return new Response(
+
+JSON.stringify({
+
+success:false,
+
+message:"GEMINI_API_KEY missing"
+
+}),
+
+{
+status:500,
+headers:{
+...corsHeaders,
+"content-type":"application/json"
+}
+}
+
 );
-console.log(
-  apiKey ? apiKey.length : 0
-);
+
+}
+
 
 
 const response = await fetch(
+
 "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key="
 + apiKey,
 
@@ -88,13 +118,22 @@ headers:{
 body:JSON.stringify({
 
 contents:[
+
 {
+
 parts:[
+
 {
-text:"AI作業マニュアル解析開始"
+
+text:
+"AI作業マニュアル解析開始。作業内容を説明してください。"
+
 }
+
 ]
+
 }
+
 ]
 
 })
@@ -105,13 +144,20 @@ text:"AI作業マニュアル解析開始"
 
 
 
-const data = await response.json();
+const data =
+await response.json();
 
 
 
 return new Response(
 
-JSON.stringify(data,null,2),
+JSON.stringify({
+
+success:true,
+
+data:data
+
+},null,2),
 
 {
 
