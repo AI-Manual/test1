@@ -16,7 +16,10 @@ export default {
     };
 
 
+    // =========================
     // CORS
+    // =========================
+
     if(request.method === "OPTIONS"){
 
       return new Response(null,{
@@ -28,7 +31,10 @@ export default {
 
 
 
+    // =========================
     // GET確認
+    // =========================
+
     if(request.method === "GET"){
 
       return new Response(
@@ -54,7 +60,10 @@ export default {
 
 
 
-    // POSTのみ
+    // =========================
+    // POSTのみ許可
+    // =========================
+
     if(request.method !== "POST"){
 
       return new Response(
@@ -81,6 +90,10 @@ export default {
     }
 
 
+
+    // =========================
+    // API KEY
+    // =========================
 
     const apiKey =
       env.GEMINI_API_KEY;
@@ -230,7 +243,7 @@ export default {
 
 
     // =========================
-    // Gemini解析
+    // Gemini 動画解析
     // =========================
 
     const geminiResponse =
@@ -259,6 +272,7 @@ export default {
 
                 parts:[
 
+
                   {
 
                     fileData:{
@@ -273,15 +287,19 @@ export default {
 
                   },
 
+
                   {
 
                     text:
-                      `
+`
 この動画を解析してください。
 
 作業マニュアル作成用です。
 
-以下の形式でJSON出力してください。
+必ずJSONのみを返してください。
+Markdown記法（```json）は使用しないでください。
+
+以下の形式で出力してください。
 
 {
 "title":"",
@@ -297,7 +315,17 @@ export default {
 "danger":[]
 }
 
-動画内の作業手順、使用工具、注意点を抽出してください。
+抽出内容：
+
+・作業名称
+・作業概要
+・作業手順
+・使用工具
+・危険ポイント
+・注意事項
+
+動画内で確認できない内容は推測せず空欄にしてください。
+
 `
 
                   }
@@ -316,31 +344,87 @@ export default {
 
 
 
+    // =========================
+    // Gemini結果
+    // =========================
+
     const result =
-  await geminiResponse.json();
+      await geminiResponse.json();
 
 
-return new Response(
 
-  JSON.stringify({
+    const text =
+      result.candidates?.[0]
+      ?.content
+      ?.parts?.[0]
+      ?.text || "";
 
-    success:true,
 
-    data:result
 
-  },null,2),
+    let manual;
 
-  {
 
-    headers:{
 
-      ...corsHeaders,
+    try{
 
-      "content-type":
-        "application/json"
+
+      manual =
+        JSON.parse(
+
+          text
+          .replace(/```json/g,"")
+          .replace(/```/g,"")
+          .trim()
+
+        );
+
+
+    }catch(e){
+
+
+      manual = {
+
+        error:"JSON parse failed",
+
+        raw:text
+
+      };
+
 
     }
 
+
+
+    // =========================
+    // 返却
+    // =========================
+
+    return new Response(
+
+      JSON.stringify({
+
+        success:true,
+
+        data:manual
+
+      },null,2),
+
+      {
+
+        headers:{
+
+          ...corsHeaders,
+
+          "content-type":
+            "application/json"
+
+        }
+
+      }
+
+    );
+
+
   }
 
-);
+};
