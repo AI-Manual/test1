@@ -2,10 +2,9 @@ export default {
 
   async fetch(request, env) {
 
-
     const corsHeaders = {
 
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin":"*",
 
       "Access-Control-Allow-Methods":
         "GET, POST, OPTIONS",
@@ -20,7 +19,7 @@ export default {
     // CORS
     // =========================
 
-    if(request.method === "OPTIONS"){
+    if(request.method==="OPTIONS"){
 
       return new Response(null,{
         status:204,
@@ -30,12 +29,11 @@ export default {
     }
 
 
-
     // =========================
-    // GET確認
+    // GET
     // =========================
 
-    if(request.method === "GET"){
+    if(request.method==="GET"){
 
       return new Response(
 
@@ -48,10 +46,16 @@ export default {
         }),
 
         {
+
           headers:{
+
             ...corsHeaders,
-            "content-type":"application/json"
+
+            "content-type":
+              "application/json"
+
           }
+
         }
 
       );
@@ -59,12 +63,11 @@ export default {
     }
 
 
-
     // =========================
     // POSTのみ
     // =========================
 
-    if(request.method !== "POST"){
+    if(request.method!=="POST"){
 
       return new Response(
 
@@ -77,12 +80,18 @@ export default {
         }),
 
         {
+
           status:405,
 
           headers:{
+
             ...corsHeaders,
-            "content-type":"application/json"
+
+            "content-type":
+              "application/json"
+
           }
+
         }
 
       );
@@ -90,10 +99,12 @@ export default {
     }
 
 
+    // =========================
+    // API KEY
+    // =========================
 
     const apiKey =
       env.GEMINI_API_KEY;
-
 
 
     if(!apiKey){
@@ -109,18 +120,23 @@ export default {
         }),
 
         {
+
           status:500,
 
           headers:{
+
             ...corsHeaders,
-            "content-type":"application/json"
+
+            "content-type":
+              "application/json"
+
           }
+
         }
 
       );
 
     }
-
 
 
     // =========================
@@ -133,7 +149,6 @@ export default {
 
     const video =
       formData.get("video");
-
 
 
     if(!video){
@@ -149,12 +164,18 @@ export default {
         }),
 
         {
+
           status:400,
 
           headers:{
+
             ...corsHeaders,
-            "content-type":"application/json"
+
+            "content-type":
+              "application/json"
+
           }
+
         }
 
       );
@@ -162,9 +183,8 @@ export default {
     }
 
 
-
     // =========================
-    // Gemini Files API upload
+    // Gemini Files Upload
     // =========================
 
     const uploadResponse =
@@ -179,8 +199,7 @@ export default {
 
           headers:{
 
-            "X-Goog-Upload-Protocol":
-              "raw",
+            "X-Goog-Upload-Protocol":"raw",
 
             "X-Goog-Upload-File-Name":
               video.name,
@@ -217,12 +236,18 @@ export default {
         },null,2),
 
         {
+
           status:500,
 
           headers:{
+
             ...corsHeaders,
-            "content-type":"application/json"
+
+            "content-type":
+              "application/json"
+
           }
+
         }
 
       );
@@ -231,11 +256,52 @@ export default {
 
 
     const fileUri =
-      uploadData.file.uri;    
-    
-    // =========================
+      uploadData.file.uri;
+        // =========================
     // Gemini 動画解析
     // =========================
+
+    const prompt = `
+あなたは作業マニュアル作成AIです。
+
+この動画を解析してください。
+
+回答は必ずJSONのみを返してください。
+説明文は禁止です。
+Markdownは禁止です。
+\`\`\`json も出力しないでください。
+
+必ず次の形式で返してください。
+
+{
+  "title":"",
+  "summary":"",
+  "steps":[
+    {
+      "stepNo":1,
+      "title":"",
+      "description":""
+    }
+  ],
+  "tools":[],
+  "parts":[],
+  "danger":[],
+  "notes":"",
+  "checklist":[]
+}
+
+条件
+
+・動画で確認できる内容だけを書く
+・推測は禁止
+・確認できない項目は空欄
+・stepsは作業順にする
+・toolsは使用工具
+・partsは部品・材料
+・dangerは危険ポイント
+・notesは補足事項
+・checklistは作業確認項目
+`;
 
     const geminiResponse =
       await fetch(
@@ -249,8 +315,7 @@ export default {
 
           headers:{
 
-            "Content-Type":
-              "application/json"
+            "Content-Type":"application/json"
 
           },
 
@@ -266,79 +331,17 @@ export default {
 
                     fileData:{
 
-                      mimeType:
-                        video.type,
+                      mimeType:video.type,
 
-                      fileUri:
-                        fileUri
+                      fileUri:fileUri
 
                     }
 
                   },
 
-
                   {
 
-                    text:
-`
-あなたは作業マニュアル作成AIです。
-
-この動画を解析してください。
-
-回答は必ずJSON形式のみで返してください。
-説明文、タイトル表示、箇条書きは禁止です。
-Markdown記法は禁止です。
-
-必ず以下のキー構成を維持してください。
-
-{
-"title":"",
-"summary":"",
-"steps":[
- {
-  "stepNo":1,
-  "title":"",
-  "description":""
- }
-],
-"tools":[],
-"danger":[]
-}
-
-条件：
-・動画で確認できる内容だけを書く
-・確認できない内容は空欄
-・推測は禁止
-・stepsには作業順序を入れる
-・toolsには使用工具を書く
-・dangerには危険ポイントを書く
-`
-
-{
-"title":"",
-"summary":"",
-"steps":[
- {
-  "stepNo":1,
-  "title":"",
-  "description":""
- }
-],
-"tools":[],
-"danger":[]
-}
-
-抽出内容：
-
-・作業名称
-・作業概要
-・作業手順
-・使用工具
-・危険ポイント
-・注意事項
-
-動画内で確認できない内容は推測せず空欄にしてください。
-`
+                    text:prompt
 
                   }
 
@@ -353,10 +356,7 @@ Markdown記法は禁止です。
         }
 
       );
-
-
-
-    // =========================
+        // =========================
     // Gemini結果取得
     // =========================
 
@@ -364,13 +364,11 @@ Markdown記法は禁止です。
       await geminiResponse.json();
 
 
-
     const text =
       result.candidates?.[0]
-      ?.content
-      ?.parts?.[0]
-      ?.text || "";
-
+        ?.content
+        ?.parts?.[0]
+        ?.text || "";
 
 
     let manual;
@@ -378,20 +376,17 @@ Markdown記法は禁止です。
 
     try{
 
-
       manual =
         JSON.parse(
 
           text
-          .replace(/```json/g,"")
-          .replace(/```/g,"")
-          .trim()
+            .replace(/```json/gi,"")
+            .replace(/```/g,"")
+            .trim()
 
         );
 
-
     }catch(e){
-
 
       return new Response(
 
@@ -401,11 +396,15 @@ Markdown記法は禁止です。
 
           message:"Gemini JSON parse failed",
 
-          raw:text
+          raw:text,
+
+          gemini:result
 
         },null,2),
 
         {
+
+          status:500,
 
           headers:{
 
@@ -420,12 +419,51 @@ Markdown記法は禁止です。
 
       );
 
-
     }
 
 
-
     // =========================
+    // GAS保存データ作成
+    // =========================
+
+    const saveData = {
+
+      jobId:
+        manual.jobId || "",
+
+      videoId:
+        manual.videoId || "",
+
+      title:
+        manual.title || "",
+
+      summary:
+        manual.summary || "",
+
+      steps:
+        manual.steps || [],
+
+      tools:
+        manual.tools || [],
+
+      parts:
+        manual.parts || [],
+
+      danger:
+        manual.danger || [],
+
+      notes:
+        manual.notes || "",
+
+      checklist:
+        manual.checklist || [],
+
+      rawJson:
+        manual
+
+    };
+
+      // =========================
     // GAS保存
     // =========================
 
@@ -433,114 +471,88 @@ Markdown記法は禁止です。
       env.GAS_API_URL;
 
 
-
     if(gasUrl){
 
+      try{
 
-      const saveData = {
+        const gasResponse =
+          await fetch(
 
+            gasUrl,
 
-        jobId:
-          manual.jobId || "",
+            {
 
+              method:"POST",
 
-        videoId:
-          manual.videoId || "",
+              headers:{
 
+                "Content-Type":
+                  "application/json"
 
-        title:
-          manual.title || "",
+              },
 
+              body:
+                JSON.stringify(saveData)
 
-        summary:
-          manual.summary || "",
+            }
 
-
-        steps:
-          manual.steps || [],
-
-
-        tools:
-          manual.tools || [],
+          );
 
 
-        parts:
-          manual.parts || [],
+        const gasResult =
+          await gasResponse.json();
 
 
-        danger:
-          manual.danger || [],
+        manual.gasSave =
+          gasResult;
 
+      }catch(e){
 
-        notes:
-          manual.notes || "",
+        manual.gasSave = {
 
+          success:false,
 
-        checklist:
-          manual.checklist || [],
+          message:
+            e.message
 
+        };
 
-        rawJson:
-          manual
+      }
+
+    }else{
+
+      manual.gasSave = {
+
+        success:false,
+
+        message:
+          "GAS_API_URL not set"
 
       };
 
-
-
-      const gasResponse =
-        await fetch(
-
-          gasUrl,
-
-          {
-
-            method:"POST",
-
-            headers:{
-
-              "Content-Type":
-                "application/json"
-
-            },
-
-            body:
-
-              JSON.stringify(
-                saveData
-              )
-
-          }
-
-        );
-
-
-
-      const gasResult =
-        await gasResponse.json();
-
-
-
-      manual.gasSave =
-        gasResult;
-
-
     }
 
-
-
-    // =========================
+      // =========================
     // 結果返却
     // =========================
 
     return new Response(
 
-      JSON.stringify({
+      JSON.stringify(
 
-        success:true,
+        {
 
-        data:manual
+          success:true,
 
-      },null,2),
+          data:manual
+
+        },
+
+        null,
+
+        2
+
+      ),
 
       {
 
@@ -557,8 +569,6 @@ Markdown記法は禁止です。
 
     );
 
-
   }
 
 };
-
