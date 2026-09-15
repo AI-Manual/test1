@@ -317,36 +317,30 @@ export default {
 
 
     const result =
-      await geminiResponse.json();
+  await geminiResponse.json();
 
 
+return new Response(
 
-    return new Response(
+  JSON.stringify({
 
-      JSON.stringify({
+    success:true,
 
-        success:true,
+    data:result
 
-        data:result
+  },null,2),
 
-      },null,2),
+  {
 
-      {
+    headers:{
 
-        headers:{
+      ...corsHeaders,
 
-          ...corsHeaders,
+      "content-type":
+        "application/json"
 
-          "content-type":
-            "application/json"
-
-        }
-
-      }
-
-    );
-
+    }
 
   }
 
-};
+);
