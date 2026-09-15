@@ -2,136 +2,191 @@ export default {
 
   async fetch(request, env) {
 
+
     const corsHeaders = {
+
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
+
+      "Access-Control-Allow-Methods":
+        "GET, POST, OPTIONS",
+
+      "Access-Control-Allow-Headers":
+        "Content-Type"
+
     };
 
 
-    if (request.method === "OPTIONS") {
+    // CORS
+    if(request.method === "OPTIONS"){
 
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders
+      return new Response(null,{
+        status:204,
+        headers:corsHeaders
       });
 
     }
 
 
-    if (request.method === "GET") {
+
+    // GET確認
+    if(request.method === "GET"){
 
       return new Response(
+
         JSON.stringify({
-          success: true,
-          message: "AI Manual Worker OK"
+
+          success:true,
+
+          message:"AI Manual Worker OK"
+
         }),
+
         {
-          headers: {
-            ...corsHeaders,
-            "content-type": "application/json"
-          }
-        }
-      );
-
-    }
-
-
-    if (request.method !== "POST") {
-
-      return new Response(
-        JSON.stringify({
-          success:false,
-          message:"Method Not Allowed"
-        }),
-        {
-          status:405,
           headers:{
             ...corsHeaders,
             "content-type":"application/json"
           }
         }
+
       );
 
     }
 
 
+
+    // POST以外拒否
+    if(request.method !== "POST"){
+
+      return new Response(
+
+        JSON.stringify({
+
+          success:false,
+
+          message:"Method Not Allowed"
+
+        }),
+
+        {
+          status:405,
+
+          headers:{
+            ...corsHeaders,
+            "content-type":"application/json"
+          }
+        }
+
+      );
+
+    }
+
+
+
+    // APIキー確認
     const apiKey = env.GEMINI_API_KEY;
 
 
-    if (!apiKey) {
+    if(!apiKey){
 
       return new Response(
+
         JSON.stringify({
+
           success:false,
+
           message:"GEMINI_API_KEY missing"
+
         }),
+
         {
           status:500,
+
           headers:{
             ...corsHeaders,
             "content-type":"application/json"
           }
         }
+
       );
 
     }
 
 
-    const response = await fetch(
 
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key="
-      + apiKey,
+    // =========================
+    // 動画取得
+    // =========================
 
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":"application/json"
-        },
-
-        body:JSON.stringify({
-
-          contents:[
-
-            {
-              parts:[
-
-                {
-                  text:"AI作業マニュアル解析開始。作業内容を説明してください。"
-                }
-
-              ]
-            }
-
-          ]
-
-        })
-
-      }
-
-    );
+    const formData =
+      await request.formData();
 
 
-    const data = await response.json();
+    const video =
+      formData.get("video");
 
+
+
+    if(!video){
+
+      return new Response(
+
+        JSON.stringify({
+
+          success:false,
+
+          message:"video missing"
+
+        }),
+
+        {
+          status:400,
+
+          headers:{
+            ...corsHeaders,
+            "content-type":"application/json"
+          }
+        }
+
+      );
+
+    }
+
+
+
+    // =========================
+    // 動画受信確認
+    // =========================
 
     return new Response(
 
-      JSON.stringify(
-        {
-          success:true,
-          data:data
-        },
-        null,
-        2
-      ),
+      JSON.stringify({
+
+        success:true,
+
+        message:"video received",
+
+        filename:
+          video.name,
+
+        type:
+          video.type,
+
+        size:
+          video.size
+
+      },null,2),
 
       {
+
         headers:{
+
           ...corsHeaders,
-          "content-type":"application/json"
+
+          "content-type":
+            "application/json"
+
         }
+
       }
 
     );
