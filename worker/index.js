@@ -68,15 +68,48 @@ export default {
       );
     }
 
-    // 利用可能モデル一覧取得
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models?key=" + apiKey
-    );
 
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
+  + apiKey,
+
+{
+  method:"POST",
+
+  headers:{
+    "Content-Type":"application/json"
+  },
+
+  body:JSON.stringify({
+
+    contents:[
+      {
+        parts:[
+          {
+            text:"AI作業マニュアル解析開始。作業内容を説明してください。"
+          }
+        ]
+      }
+    ]
+
+  })
+
+}
+
+);
+        // Gemini結果取得
     const data = await response.json();
 
+    // 結果返却
     return new Response(
-      JSON.stringify(data, null, 2),
+      JSON.stringify(
+        {
+          success: true,
+          data: data
+        },
+        null,
+        2
+      ),
       {
         headers: {
           ...corsHeaders,
