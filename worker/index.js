@@ -359,18 +359,47 @@ Markdownは禁止です。
         // =========================
     // Gemini結果取得
     // =========================
-
     const result =
-      await geminiResponse.json();
+  await geminiResponse.json();
 
+if(result.error){
 
-    const text =
-      result.candidates?.[0]
-        ?.content
-        ?.parts?.[0]
-        ?.text || "";
+  return new Response(
 
+    JSON.stringify({
 
+      success:false,
+
+      message:"Gemini API error",
+
+      gemini:result
+
+    },null,2),
+
+    {
+
+      status:500,
+
+      headers:{
+
+        ...corsHeaders,
+
+        "content-type":"application/json"
+
+      }
+
+    }
+
+  );
+
+}
+
+const text =
+  result.candidates?.[0]
+    ?.content
+    ?.parts?.[0]
+    ?.text || "";
+   
     let manual;
 
 
