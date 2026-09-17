@@ -277,12 +277,20 @@ Markdownは禁止です。
   "title":"",
   "summary":"",
   "steps":[
-    {
-      "stepNo":1,
-      "title":"",
-      "description":""
-    }
-  ],
+  {
+    "stepNo":1,
+    "title":"",
+    "description":"",
+    "startTime":"",
+    "endTime":"",
+    "snapshotTime":"",
+    "imageId":"",
+    "tool":"",
+    "part":"",
+    "danger":"",
+    "note":""
+  }
+],
   "tools":[],
   "parts":[],
   "danger":[],
@@ -296,11 +304,18 @@ Markdownは禁止です。
 ・推測は禁止
 ・確認できない項目は空欄
 ・stepsは作業順にする
-・toolsは使用工具
-・partsは部品・材料
-・dangerは危険ポイント
-・notesは補足事項
-・checklistは作業確認項目
+・各stepには startTime、endTime を mm:ss 形式で付ける
+・snapshotTime はその手順を代表する場面の時刻(mm:ss)
+・imageId は空欄
+・tool はその手順で使用した工具
+・part はその手順で扱う部品・材料
+・danger はその手順の危険ポイント
+・note はその手順の補足事項
+・tools は動画全体で使用する工具一覧
+・parts は動画全体で使用する部品・材料一覧
+・danger は動画全体の危険ポイント一覧
+・notes は動画全体の補足事項
+・checklist は最終確認項目
 `;
 
     const geminiResponse =
