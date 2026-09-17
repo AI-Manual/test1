@@ -249,7 +249,7 @@ export default {
     const cloudinary =
       await cloudinaryResponse.json();
 
-
+console.log("Cloudinary response", cloudinary);
 
     if(!cloudinary.public_id){
 
@@ -262,6 +262,9 @@ export default {
 
           message:"Cloudinary upload failed",
 
+　　　　　　 cloudinaryResponseStatus:
+        cloudinaryResponse.status,
+          
           cloudinary
 
         },null,2),
