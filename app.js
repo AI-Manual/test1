@@ -2,7 +2,6 @@ const API_URL =
   "https://test1.valhiroyuki.workers.dev";
 
 
-
 document
 .getElementById("analyzeBtn")
 .addEventListener("click", async ()=>{
@@ -14,7 +13,6 @@ document
     .files[0];
 
 
-
   if(!file){
 
     alert("動画を選択してください");
@@ -24,15 +22,12 @@ document
   }
 
 
-
   const result =
     document.getElementById("result");
 
 
-
   result.textContent =
     "解析中...";
-
 
 
   try {
@@ -42,12 +37,10 @@ document
       new FormData();
 
 
-
     formData.append(
       "video",
       file
     );
-
 
 
     const res =
@@ -66,10 +59,8 @@ document
       );
 
 
-
     const response =
       await res.json();
-
 
 
     if(!response.success){
@@ -85,10 +76,8 @@ document
     }
 
 
-
     const manual =
       response.data;
-
 
 
     let output =
@@ -102,10 +91,8 @@ document
 
     output +=
 `
-タイトル：
-${manual.title || ""}
-
-
+<h2>タイトル</h2>
+<p>${manual.title || ""}</p>
 `;
 
 
@@ -116,10 +103,8 @@ ${manual.title || ""}
 
     output +=
 `
-概要：
-${manual.summary || ""}
-
-
+<h2>概要</h2>
+<p>${manual.summary || ""}</p>
 `;
 
 
@@ -130,8 +115,7 @@ ${manual.summary || ""}
 
     output +=
 `
-作業手順：
-
+<h2>作業手順</h2>
 `;
 
 
@@ -146,13 +130,49 @@ ${manual.summary || ""}
 
         output +=
 `
-${step.stepNo}.
-${step.title}
+<h3>${step.stepNo}. ${step.title || ""}</h3>
 
-${step.description}
-
-
+<p>
+${step.description || ""}
+</p>
 `;
+
+
+
+        // =====================
+        // snapshot画像
+        // =====================
+
+        if(step.imageId){
+
+
+          output +=
+`
+<img 
+src="${step.imageId}" 
+width="400"
+>
+
+<br>
+`;
+
+        }
+
+
+
+        if(step.snapshotTime){
+
+
+          output +=
+`
+<p>
+snapshot:
+${step.snapshotTime}
+</p>
+`;
+
+        }
+
 
 
       });
@@ -168,10 +188,8 @@ ${step.description}
 
     output +=
 `
-使用工具：
-
+<h2>使用工具</h2>
 `;
-
 
 
     if(
@@ -183,7 +201,8 @@ ${step.description}
 
 
         output +=
-`・${tool}
+`
+<p>・${tool}</p>
 `;
 
 
@@ -200,11 +219,8 @@ ${step.description}
 
     output +=
 `
-
-注意事項：
-
+<h2>注意事項</h2>
 `;
-
 
 
     if(
@@ -216,7 +232,8 @@ ${step.description}
 
 
         output +=
-`・${danger}
+`
+<p>・${danger}</p>
 `;
 
 
@@ -227,7 +244,7 @@ ${step.description}
 
 
 
-    result.textContent =
+    result.innerHTML =
       output;
 
 
