@@ -249,7 +249,15 @@ export default {
     const cloudinary =
       await cloudinaryResponse.json();
 
-console.log("Cloudinary response", cloudinary);
+console.log(
+  "Cloudinary public_id:",
+  cloudinary.public_id || "NONE"
+);
+
+console.log(
+  "Cloudinary error:",
+  JSON.stringify(cloudinary.error || {})
+);
 
     if(!cloudinary.public_id){
 
