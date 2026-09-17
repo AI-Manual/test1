@@ -2,6 +2,7 @@ export default {
 
   async fetch(request, env) {
 
+
     const corsHeaders = {
 
       "Access-Control-Allow-Origin":"*",
@@ -13,6 +14,7 @@ export default {
         "Content-Type"
 
     };
+
 
 
     // =========================
@@ -27,6 +29,7 @@ export default {
       });
 
     }
+
 
 
     // =========================
@@ -61,6 +64,7 @@ export default {
       );
 
     }
+
 
 
     // =========================
@@ -99,12 +103,14 @@ export default {
     }
 
 
+
     // =========================
     // API KEY
     // =========================
 
     const apiKey =
       env.GEMINI_API_KEY;
+
 
 
     if(!apiKey){
@@ -139,6 +145,7 @@ export default {
     }
 
 
+
     // =========================
     // 動画取得
     // =========================
@@ -147,8 +154,10 @@ export default {
       await request.formData();
 
 
+
     const video =
       formData.get("video");
+
 
 
     if(!video){
@@ -183,7 +192,99 @@ export default {
     }
 
 
+
     // =========================
+    // Cloudinary Upload
+    // =========================
+
+    const cloudinaryForm =
+      new FormData();
+
+
+
+    cloudinaryForm.append(
+      "file",
+      video
+    );
+
+
+
+    cloudinaryForm.append(
+
+      "upload_preset",
+
+      env.CLOUDINARY_UPLOAD_PRESET
+
+    );
+
+
+
+    cloudinaryForm.append(
+
+      "folder",
+
+      "videos"
+
+    );
+
+
+
+    const cloudinaryResponse =
+      await fetch(
+
+        `https://api.cloudinary.com/v1_1/${env.CLOUDINARY_CLOUD_NAME}/video/upload`,
+
+        {
+
+          method:"POST",
+
+          body:cloudinaryForm
+
+        }
+
+      );
+
+
+
+    const cloudinary =
+      await cloudinaryResponse.json();
+
+
+
+    if(!cloudinary.public_id){
+
+
+      return new Response(
+
+        JSON.stringify({
+
+          success:false,
+
+          message:"Cloudinary upload failed",
+
+          cloudinary
+
+        },null,2),
+
+        {
+
+          status:500,
+
+          headers:{
+
+            ...corsHeaders,
+
+            "content-type":
+              "application/json"
+
+          }
+
+        }
+
+      );
+
+    }
+        // =========================
     // Gemini Files Upload
     // =========================
 
@@ -217,11 +318,14 @@ export default {
       );
 
 
+
     const uploadData =
       await uploadResponse.json();
 
 
+
     if(!uploadData.file){
+
 
       return new Response(
 
@@ -255,13 +359,19 @@ export default {
     }
 
 
+
     const fileUri =
       uploadData.file.uri;
-        // =========================
+
+
+
+
+    // =========================
     // Gemini 動画解析
     // =========================
 
     const prompt = `
+
 あなたは作業マニュアル作成AIです。
 
 この動画を解析してください。
@@ -277,20 +387,20 @@ Markdownは禁止です。
   "title":"",
   "summary":"",
   "steps":[
-  {
-    "stepNo":1,
-    "title":"",
-    "description":"",
-    "startTime":"",
-    "endTime":"",
-    "snapshotTime":"",
-    "imageId":"",
-    "tool":"",
-    "part":"",
-    "danger":"",
-    "note":""
-  }
-],
+    {
+      "stepNo":1,
+      "title":"",
+      "description":"",
+      "startTime":"",
+      "endTime":"",
+      "snapshotTime":"",
+      "imageId":"",
+      "tool":"",
+      "part":"",
+      "danger":"",
+      "note":""
+    }
+  ],
   "tools":[],
   "parts":[],
   "danger":[],
@@ -298,24 +408,43 @@ Markdownは禁止です。
   "checklist":[]
 }
 
+
 条件
 
 ・動画で確認できる内容だけを書く
 ・推測は禁止
 ・確認できない項目は空欄
 ・stepsは作業順にする
-・各stepには startTime、endTime を mm:ss 形式で付ける
-・snapshotTime はその手順を代表する場面の時刻(mm:ss)
-・imageId は空欄
-・tool はその手順で使用した工具
-・part はその手順で扱う部品・材料
-・danger はその手順の危険ポイント
-・note はその手順の補足事項
-・tools は動画全体で使用する工具一覧
-・parts は動画全体で使用する部品・材料一覧
-・danger は動画全体の危険ポイント一覧
-・notes は動画全体の補足事項
-・checklist は最終確認項目
+
+・各stepには
+  startTime
+  endTime
+  snapshotTime
+  を mm:ss 形式で付ける
+
+・snapshotTimeは、その手順を代表する場面の時刻
+
+・imageIdは空欄
+
+・toolはその手順で使用した工具
+
+・partはその手順で扱う部品・材料
+
+・dangerはその手順の危険ポイント
+
+・noteはその手順の補足事項
+
+
+・toolsは動画全体で使用する工具一覧
+
+・partsは動画全体で使用する部品・材料一覧
+
+・dangerは動画全体の危険ポイント一覧
+
+・notesは動画全体の補足事項
+
+・checklistは最終確認項目
+
 `;
 
     const geminiResponse =
@@ -371,54 +500,68 @@ Markdownは禁止です。
         }
 
       );
-        // =========================
+
+
+
+
+    // =========================
     // Gemini結果取得
     // =========================
+
     const result =
-  await geminiResponse.json();
+      await geminiResponse.json();
 
-if(result.error){
 
-  return new Response(
 
-    JSON.stringify({
+    if(result.error){
 
-      success:false,
+      return new Response(
 
-      message:"Gemini API error",
+        JSON.stringify({
 
-      gemini:result
+          success:false,
 
-    },null,2),
+          message:"Gemini API error",
 
-    {
+          gemini:result
 
-      status:500,
+        },null,2),
 
-      headers:{
+        {
 
-        ...corsHeaders,
+          status:500,
 
-        "content-type":"application/json"
+          headers:{
 
-      }
+            ...corsHeaders,
+
+            "content-type":
+              "application/json"
+
+          }
+
+        }
+
+      );
 
     }
 
-  );
 
-}
 
-const text =
-  result.candidates?.[0]
-    ?.content
-    ?.parts?.[0]
-    ?.text || "";
-   
+    const text =
+      result.candidates?.[0]
+        ?.content
+        ?.parts?.[0]
+        ?.text || "";
+
+
+
     let manual;
 
 
+
     try{
+
 
       manual =
         JSON.parse(
@@ -430,7 +573,9 @@ const text =
 
         );
 
+
     }catch(e){
+
 
       return new Response(
 
@@ -463,8 +608,62 @@ const text =
 
       );
 
+
     }
 
+
+
+
+    // =========================
+    // snapshot imageId生成
+    // =========================
+
+    if(
+
+      Array.isArray(manual.steps)
+
+    ){
+
+
+      manual.steps.forEach(step=>{
+
+
+        if(!step.snapshotTime){
+
+          return;
+
+        }
+
+
+
+        const time =
+          step.snapshotTime.split(":");
+
+
+
+        if(time.length !== 2){
+
+          return;
+
+        }
+
+
+
+        const seconds =
+          Number(time[0]) * 60 +
+          Number(time[1]);
+
+
+
+        step.imageId =
+
+          `https://res.cloudinary.com/${env.CLOUDINARY_CLOUD_NAME}/video/upload/so_${seconds}/${cloudinary.public_id}.jpg`;
+
+
+      });
+
+
+    }
 
     // =========================
     // GAS保存データ作成
@@ -472,42 +671,56 @@ const text =
 
     const saveData = {
 
+
       jobId:
         manual.jobId || "",
+
 
       videoId:
         manual.videoId || "",
 
+
       title:
         manual.title || "",
+
 
       summary:
         manual.summary || "",
 
+
       steps:
         manual.steps || [],
+
 
       tools:
         manual.tools || [],
 
+
       parts:
         manual.parts || [],
+
 
       danger:
         manual.danger || [],
 
+
       notes:
         manual.notes || "",
 
+
       checklist:
         manual.checklist || [],
+
 
       rawJson:
         manual
 
     };
 
-      // =========================
+
+
+
+    // =========================
     // GAS保存
     // =========================
 
@@ -515,9 +728,12 @@ const text =
       env.GAS_API_URL;
 
 
+
     if(gasUrl){
 
+
       try{
+
 
         const gasResponse =
           await fetch(
@@ -535,7 +751,9 @@ const text =
 
               },
 
+
               body:
+
                 JSON.stringify(saveData)
 
             }
@@ -543,76 +761,115 @@ const text =
           );
 
 
+
         const gasResult =
           await gasResponse.json();
+
 
 
         manual.gasSave =
           gasResult;
 
+
+
       }catch(e){
+
 
         manual.gasSave = {
 
+
           success:false,
 
+
           message:
+
             e.message
+
 
         };
 
+
       }
+
+
 
     }else{
 
+
       manual.gasSave = {
+
 
         success:false,
 
+
         message:
+
           "GAS_API_URL not set"
+
 
       };
 
+
     }
 
-      // =========================
+
+
+
+    // =========================
     // 結果返却
     // =========================
 
     return new Response(
 
+
       JSON.stringify(
+
 
         {
 
+
           success:true,
+
 
           data:manual
 
+
         },
+
 
         null,
 
+
         2
+
 
       ),
 
+
       {
+
 
         headers:{
 
+
           ...corsHeaders,
 
+
           "content-type":
+
             "application/json"
+
 
         }
 
+
       }
+
 
     );
 
+
   }
+
 
 };
