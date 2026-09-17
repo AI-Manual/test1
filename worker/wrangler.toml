@@ -1,3 +1,28 @@
 name = "ai-manual-worker"
 main = "index.js"
 compatibility_date = "2026-09-11"
+
+{
+  "name": "test1",
+  "main": "index.js",
+  "compatibility_date": "2026-09-01",
+
+  "vars": {
+    "CLOUDINARY_CLOUD_NAME": "iq3xt7iy",
+    "CLOUDINARY_UPLOAD_PRESET": "videos_upload"
+  },
+
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true
+    }
+  }
+}
