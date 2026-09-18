@@ -66,23 +66,16 @@ if(request.method==="GET"){
 
 
     return new Response(
-
-      JSON.stringify(data),
-
-      {
-
-        headers:{
-
-          ...corsHeaders,
-
-          "content-type":
-            "application/json"
-
-        }
-
-      }
-
-    );
+  JSON.stringify(data),
+  {
+    headers:{
+      "Access-Control-Allow-Origin":"*",
+      "Access-Control-Allow-Methods":"GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers":"Content-Type",
+      "content-type":"application/json"
+    }
+  }
+);
 
   }
 
