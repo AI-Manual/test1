@@ -112,7 +112,74 @@ if(request.method==="GET"){
 
 }
 
+    // =========================
+    // 保存済みマニュアル更新保存
+    // =========================
 
+    if(
+      request.method==="POST" &&
+      new URL(request.url).pathname==="/api/save"
+    ){
+
+
+      const saveData =
+        await request.json();
+
+
+      const gasResponse =
+        await fetch(
+
+          env.GAS_API_URL,
+
+          {
+
+            method:"POST",
+
+            headers:{
+
+              "Content-Type":
+                "application/json"
+
+            },
+
+            body:
+              JSON.stringify({
+
+                action:"updateResult",
+
+                data:saveData
+
+              })
+    
+          }
+
+        );
+
+
+      const gasResult =
+        await gasResponse.json();
+
+
+      return new Response(
+
+        JSON.stringify(gasResult),
+
+        {
+
+          headers:{
+
+            ...corsHeaders,
+
+            "content-type":
+              "application/json"
+
+          }
+
+        }
+
+      );
+
+    }
 
     // =========================
     // POSTのみ
