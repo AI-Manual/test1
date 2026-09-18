@@ -744,3 +744,76 @@ ${item.createdAt || ""}
 
 
 });
+
+// =====================
+// 保存済みマニュアル詳細表示
+// =====================
+
+function showManualDetail(manual){
+
+
+  const result =
+    document.getElementById("result");
+
+
+  let output =
+`
+<h2>${manual.title || ""}</h2>
+
+<p>
+${manual.summary || ""}
+</p>
+
+<h3>作業手順</h3>
+`;
+
+
+  if(Array.isArray(manual.steps)){
+
+
+    manual.steps.forEach(step=>{
+
+
+      output +=
+`
+<div
+ style="
+ border:1px solid #ccc;
+ padding:10px;
+ margin-bottom:15px;
+ "
+>
+
+<h4>
+手順 ${step.stepNo}
+：
+${step.title || ""}
+</h4>
+
+<p>
+${step.description || ""}
+</p>
+
+<p>
+開始：
+${step.startTime || ""}
+<br>
+終了：
+${step.endTime || ""}
+</p>
+
+</div>
+`;
+
+
+    });
+
+
+  }
+
+
+  result.innerHTML =
+    output;
+
+
+}
