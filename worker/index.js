@@ -735,155 +735,140 @@ if(result.error){
 
 
     // =========================
-    // GAS保存
-    // =========================
+// GAS保存
+// =========================
 
-    const gasUrl =
-      env.GAS_API_URL;
-
-
-
-    if(gasUrl){
+const gasUrl =
+  env.GAS_API_URL;
 
 
-      try{
+let gasSave = null;
 
 
-        const gasResponse =
-          await fetch(
-
-            gasUrl,
-
-            {
-
-              method:"POST",
-
-              headers:{
-
-                "Content-Type":
-                  "application/json"
-
-              },
+if(gasUrl){
 
 
-              body:
-
-                JSON.stringify(saveData)
-
-            }
-
-          );
+  try{
 
 
+    const gasResponse =
+      await fetch(
 
-        const gasResult =
-          await gasResponse.json();
-
-
-
-        manual.gasSave =
-          gasResult;
-
-
-
-      }catch(e){
-
-
-        manual.gasSave = {
-
-
-          success:false,
-
-
-          message:
-
-            e.message
-
-
-        };
-
-
-      }
-
-
-
-    }else{
-
-
-      manual.gasSave = {
-
-
-        success:false,
-
-
-        message:
-
-          "GAS_API_URL not set"
-
-
-      };
-
-
-    }
-
-
-
-
-    // =========================
-    // 結果返却
-    // =========================
-
-    return new Response(
-
-
-      JSON.stringify(
-
+        gasUrl,
 
         {
 
+          method:"POST",
 
-          success:true,
+          headers:{
 
+            "Content-Type":
+              "application/json"
 
-          data:manual
-
-
-        },
-
-
-        null,
+          },
 
 
-        2
+          body:
 
-
-      ),
-
-
-      {
-
-
-        headers:{
-
-
-          ...corsHeaders,
-
-
-          "content-type":
-
-            "application/json"
-
+            JSON.stringify(saveData)
 
         }
 
+      );
 
-      }
+
+    gasSave =
+      await gasResponse.json();
 
 
-    );
+  }catch(e){
+
+
+    gasSave = {
+
+      success:false,
+
+      message:e.message
+
+    };
 
 
   }
 
 
-};
+}else{
+
+
+  gasSave = {
+
+    success:false,
+
+    message:"GAS_API_URL not set"
+
+  };
+
+
+}
+
+
+// GAS保存結果をmanualへ追加
+
+manual.gasSave =
+  gasSave;
+
+
+
+// =========================
+// 結果返却
+// =========================
+
+return new Response(
+
+
+  JSON.stringify(
+
+
+    {
+
+      success:true,
+
+      data:{
+
+        ...manual,
+
+        gasSave:gasSave
+
+      }
+
+    },
+
+
+    null,
+
+    2
+
+
+  ),
+
+
+  {
+
+
+    headers:{
+
+
+      ...corsHeaders,
+
+
+      "content-type":
+
+        "application/json"
+
+
+    }
+
+
+  }
+
+
+);
