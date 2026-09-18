@@ -77,6 +77,12 @@ document
     const manual =
       response.data;
 
+    manual.aiResultId =
+  response.data.gasSave?.aiResultId || "";
+
+    manual.createdAt =
+  new Date().toISOString();
+
 
     let output =
       "";
