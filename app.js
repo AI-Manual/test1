@@ -598,10 +598,52 @@ document
   };
 
 
-  console.log(
-    "保存データ",
-    saveData
+  const saveResponse =
+  await fetch(
+
+    API_URL + "/api/save",
+
+    {
+
+      method:"POST",
+
+      headers:{
+
+        "Content-Type":
+          "application/json"
+
+      },
+
+      body:
+        JSON.stringify(saveData)
+
+    }
+
   );
+
+
+const saveResult =
+  await saveResponse.json();
+
+
+console.log(
+  "保存結果",
+  saveResult
+);
+
+
+if(saveResult.success){
+
+  alert("保存しました");
+
+}else{
+
+  alert(
+    saveResult.message ||
+    "保存失敗"
+  );
+
+}
 
 
 });
