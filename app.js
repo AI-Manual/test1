@@ -516,13 +516,12 @@ ${step.note || ""}
 <button
   id="saveManualBtn"
   type="button"
-  disabled
   style="
     padding:10px 30px;
     font-size:16px;
-    cursor:not-allowed;
+    cursor:pointer;
   ">
-保存（次回実装）
+保存確認
 </button>
 
 </div>
@@ -530,312 +529,82 @@ ${step.note || ""}
 
 
     result.innerHTML =
-      output;
+  output;
 
 
-  } catch(error){
-
-
-    result.textContent =
-      JSON.stringify(
-
-        {
-
-          success:false,
-
-          message:error.message
-
-        },
-
-        null,
-
-        2
-
-      );
-
-
-  }
-
-
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const API_URL =
-  "https://test1.valhiroyuki.workers.dev";
-
+// =====================
+// 保存ボタン処理
+// =====================
 
 document
-.getElementById("analyzeBtn")
-.addEventListener("click", async ()=>{
+.getElementById("saveManualBtn")
+.addEventListener("click", ()=>{
 
+  const saveData = {
 
-  const file =
-    document
-    .getElementById("videoFile")
-    .files[0];
+    aiResultId:
+      manual.aiResultId || "",
 
+    createdAt:
+      manual.createdAt || "",
 
-  if(!file){
+    title:
+      document
+      .getElementById("manualTitle")
+      .value,
 
-    alert("動画を選択してください");
+    summary:
+      document
+      .getElementById("manualSummary")
+      .value,
 
-    return;
+    notes:
+      document
+      .getElementById("manualNotes")
+      ?.value || "",
 
-  }
+    steps:
+      manual.steps.map(step=>{
 
+        return {
 
-  const result =
-    document.getElementById("result");
+          stepNo:
+            step.stepNo,
 
+          title:
+            document
+            .getElementById(
+              "stepTitle" + step.stepNo
+            )
+            .value,
 
-  result.textContent =
-    "解析中...";
+          description:
+            document
+            .getElementById(
+              "stepDescription" + step.stepNo
+            )
+            .value,
 
+          imageId:
+            step.imageId,
 
-  try {
+          snapshotTime:
+            step.snapshotTime
 
+        };
 
-    const formData =
-      new FormData();
+      })
 
+  };
 
-    formData.append(
-      "video",
-      file
-    );
 
+  console.log(
+    "保存データ",
+    saveData
+  );
 
-    const res =
-      await fetch(
 
-        API_URL + "/api/analyze",
-
-        {
-
-          method:"POST",
-
-          body:formData
-
-        }
-
-      );
-
-
-    const response =
-      await res.json();
-
-
-    if(!response.success){
-
-      result.textContent =
-        response.message ||
-        "解析に失敗しました";
-
-      return;
-
-    }
-
-
-    const manual =
-      response.data;
-
-
-    let output =
-      "";
-
-
-    // =====================
-    // タイトル
-    // =====================
-
-    output +=
-`
-<h2>タイトル</h2>
-<p>${manual.title || ""}</p>
-`;
-
-
-    // =====================
-    // 概要
-    // =====================
-
-    output +=
-`
-<h2>概要</h2>
-<p>${manual.summary || ""}</p>
-`;
-
-
-    // =====================
-    // 手順
-    // =====================
-
-    output +=
-`
-<h2>作業手順</h2>
-`;
-
-
-    if(
-      Array.isArray(manual.steps)
-    ){
-
-
-      manual.steps.forEach(step=>{
-
-
-        output +=
-`
-<div style="margin-bottom:40px;">
-
-<h3>${step.stepNo}. ${step.title || ""}</h3>
-`;
-
-
-        // =====================
-        // snapshot画像
-        // =====================
-
-        if(step.imageId){
-
-          output +=
-`
-<img
-  src="${step.imageId}"
-  style="
-    max-width:500px;
-    width:100%;
-    border:1px solid #ccc;
-    margin:10px 0;
-  ">
-`;
-
-        }
-
-
-        if(step.snapshotTime){
-
-          output +=
-`
-<p>
-<b>Snapshot :</b>
-${step.snapshotTime}
-</p>
-`;
-
-        }
-
-
-        output +=
-`
-<p>
-${step.description || ""}
-</p>
-
-</div>
-`;
-
-
-      });
-
-
-    }
-
-
-    // =====================
-    // 工具
-    // =====================
-
-    output +=
-`
-<h2>使用工具</h2>
-`;
-
-
-    if(
-      Array.isArray(manual.tools)
-    ){
-
-      if(manual.tools.length){
-
-        manual.tools.forEach(tool=>{
-
-          output +=
-`
-<p>・${tool}</p>
-`;
-
-        });
-
-      }else{
-
-        output +=
-`
-<p>なし</p>
-`;
-
-      }
-
-    }
-
-
-    // =====================
-    // 注意事項
-    // =====================
-
-    output +=
-`
-<h2>注意事項</h2>
-`;
-
-
-    if(
-      Array.isArray(manual.danger)
-    ){
-
-      if(manual.danger.length){
-
-        manual.danger.forEach(danger=>{
-
-          output +=
-`
-<p>・${danger}</p>
-`;
-
-        });
-
-      }else{
-
-        output +=
-`
-<p>なし</p>
-`;
-
-      }
-
-    }
-
-
-    result.innerHTML =
-      output;
+});
 
 
   } catch(error){
@@ -863,3 +632,4 @@ ${step.description || ""}
 
 
 });
+
