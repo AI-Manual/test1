@@ -32,38 +32,92 @@ export default {
 
 
 
-    // =========================
-    // GET
-    // =========================
+// =========================
+// GET
+// =========================
 
-    if(request.method==="GET"){
+if(request.method==="GET"){
 
-      return new Response(
+  const url =
+    new URL(request.url);
 
-        JSON.stringify({
+  const path =
+    url.pathname;
 
-          success:true,
 
-          message:"AI Manual Worker OK"
+  // =========================
+  // 保存済みマニュアル一覧取得
+  // =========================
 
-        }),
+  if(path==="/api/results"){
 
-        {
 
-          headers:{
+    const gasUrl =
+      env.GAS_API_URL +
+      "?action=results";
 
-            ...corsHeaders,
 
-            "content-type":
-              "application/json"
+    const gasResponse =
+      await fetch(gasUrl);
 
-          }
+
+    const data =
+      await gasResponse.json();
+
+
+    return new Response(
+
+      JSON.stringify(data),
+
+      {
+
+        headers:{
+
+          ...corsHeaders,
+
+          "content-type":
+            "application/json"
 
         }
 
-      );
+      }
+
+    );
+
+  }
+
+
+
+  // =========================
+  // 通常GET確認
+  // =========================
+
+  return new Response(
+
+    JSON.stringify({
+
+      success:true,
+
+      message:"AI Manual Worker OK"
+
+    }),
+
+    {
+
+      headers:{
+
+        ...corsHeaders,
+
+        "content-type":
+          "application/json"
+
+      }
 
     }
+
+  );
+
+}
 
 
 
