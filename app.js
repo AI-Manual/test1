@@ -633,3 +633,110 @@ document
 
 });
 
+// =====================
+// 保存済みマニュアル一覧取得
+// =====================
+
+document
+.getElementById("loadResultsBtn")
+.addEventListener("click", async ()=>{
+
+
+  const result =
+    document.getElementById("result");
+
+
+  result.textContent =
+    "読み込み中...";
+
+
+  try{
+
+
+    const res =
+      await fetch(
+
+        API_URL + "/api/results"
+
+      );
+
+
+    const response =
+      await res.json();
+
+
+
+    if(!response.success){
+
+
+      result.textContent =
+        response.message ||
+        "取得失敗";
+
+
+      return;
+
+    }
+
+
+
+    let output =
+      "<h2>保存済みマニュアル一覧</h2>";
+
+
+
+    response.results.forEach(item=>{
+
+
+      output +=
+`
+<div
+ style="
+  border:1px solid #ccc;
+  padding:10px;
+  margin-bottom:10px;
+ "
+>
+
+
+<h3>
+${item.title || ""}
+</h3>
+
+
+<p>
+${item.summary || ""}
+</p>
+
+
+<p>
+作成日時：
+${item.createdAt || ""}
+</p>
+
+
+</div>
+`;
+
+
+
+    });
+
+
+
+    result.innerHTML =
+      output;
+
+
+
+  }catch(e){
+
+
+    result.textContent =
+      e.message;
+
+
+  }
+
+
+});
