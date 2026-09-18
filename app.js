@@ -65,11 +65,9 @@ document
 
     if(!response.success){
 
-
       result.textContent =
         response.message ||
         "解析に失敗しました";
-
 
       return;
 
@@ -84,7 +82,6 @@ document
       "";
 
 
-
     // =====================
     // タイトル
     // =====================
@@ -94,7 +91,6 @@ document
 <h2>タイトル</h2>
 <p>${manual.title || ""}</p>
 `;
-
 
 
     // =====================
@@ -108,7 +104,6 @@ document
 `;
 
 
-
     // =====================
     // 手順
     // =====================
@@ -117,7 +112,6 @@ document
 `
 <h2>作業手順</h2>
 `;
-
 
 
     if(
@@ -130,13 +124,10 @@ document
 
         output +=
 `
+<div style="margin-bottom:40px;">
+
 <h3>${step.stepNo}. ${step.title || ""}</h3>
-
-<p>
-${step.description || ""}
-</p>
 `;
-
 
 
         // =====================
@@ -145,28 +136,27 @@ ${step.description || ""}
 
         if(step.imageId){
 
-
           output +=
 `
-<img 
-src="${step.imageId}" 
-width="400"
->
-
-<br>
+<img
+  src="${step.imageId}"
+  style="
+    max-width:500px;
+    width:100%;
+    border:1px solid #ccc;
+    margin:10px 0;
+  ">
 `;
 
         }
 
 
-
         if(step.snapshotTime){
-
 
           output +=
 `
 <p>
-snapshot:
+<b>Snapshot :</b>
 ${step.snapshotTime}
 </p>
 `;
@@ -174,12 +164,20 @@ ${step.snapshotTime}
         }
 
 
+        output +=
+`
+<p>
+${step.description || ""}
+</p>
+
+</div>
+`;
+
 
       });
 
 
     }
-
 
 
     // =====================
@@ -196,21 +194,27 @@ ${step.snapshotTime}
       Array.isArray(manual.tools)
     ){
 
+      if(manual.tools.length){
 
-      manual.tools.forEach(tool=>{
+        manual.tools.forEach(tool=>{
 
-
-        output +=
+          output +=
 `
 <p>・${tool}</p>
 `;
 
+        });
 
-      });
+      }else{
 
+        output +=
+`
+<p>なし</p>
+`;
+
+      }
 
     }
-
 
 
     // =====================
@@ -227,30 +231,34 @@ ${step.snapshotTime}
       Array.isArray(manual.danger)
     ){
 
+      if(manual.danger.length){
 
-      manual.danger.forEach(danger=>{
+        manual.danger.forEach(danger=>{
 
-
-        output +=
+          output +=
 `
 <p>・${danger}</p>
 `;
 
+        });
 
-      });
+      }else{
 
+        output +=
+`
+<p>なし</p>
+`;
+
+      }
 
     }
-
 
 
     result.innerHTML =
       output;
 
 
-
   } catch(error){
-
 
 
     result.textContent =
