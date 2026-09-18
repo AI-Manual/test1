@@ -524,38 +524,41 @@ Markdownは禁止です。
 
 
 
-    if(result.error){
+if(result.error){
 
-      return new Response(
+  return new Response(
 
-        JSON.stringify({
+    JSON.stringify({
 
-          success:false,
+      success:false,
 
-          message:"Gemini API error",
+      message:"Gemini API error",
 
-          gemini:result
+      cloudinary,
 
-        },null,2),
+      uploadData,
 
-        {
+      gemini:result
 
-          status:500,
+    },null,2),
 
-          headers:{
+    {
 
-            ...corsHeaders,
+      status:500,
 
-            "content-type":
-              "application/json"
+      headers:{
 
-          }
+        ...corsHeaders,
 
-        }
+        "content-type":"application/json"
 
-      );
+      }
 
     }
+
+  );
+
+}
 
 
 
