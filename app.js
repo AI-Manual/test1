@@ -685,17 +685,19 @@ document
 
 
 
-    response.results.forEach(item=>{
+    response.results.response.results.forEach(item=>{
 
 
-      output +=
+  output +=
 `
 <div
  style="
   border:1px solid #ccc;
   padding:10px;
   margin-bottom:10px;
+  cursor:pointer;
  "
+ onclick='showManualDetail(${JSON.stringify(item)})'
 >
 
 
@@ -717,6 +719,8 @@ ${item.createdAt || ""}
 
 </div>
 `;
+
+});
 
 
 
