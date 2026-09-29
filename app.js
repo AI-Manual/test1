@@ -682,6 +682,7 @@ document
 
  }
 });
+
 // =====================
 // 保存済みマニュアル一覧取得
 // =====================
@@ -716,6 +717,44 @@ document
 
     }
 
+// =====================
+// 説明動画作成
+// =====================
+
+document
+.getElementById("movieBtn")
+.addEventListener("click", async ()=>{
+
+  const res =
+    await fetch(
+
+      API_URL + "/api/movie",
+
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:
+          JSON.stringify(manual)
+
+      }
+
+    );
+
+  const response =
+    await res.json();
+
+  console.log(response);
+
+  alert(response.message);
+
+});
+
+    
     let output =
       "<h2>保存済みマニュアル一覧</h2>";
 
