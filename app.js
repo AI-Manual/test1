@@ -790,10 +790,8 @@ ${item.createdAt || ""}
 
 function showManualDetail(manual){
 
-
   const result =
     document.getElementById("result");
-
 
   let output =
 `
@@ -806,53 +804,212 @@ ${manual.summary || ""}
 <h3>作業手順</h3>
 `;
 
-
   if(Array.isArray(manual.steps)){
 
-
     manual.steps.forEach(step=>{
-
 
       output +=
 `
 <div
  style="
- border:1px solid #ccc;
- padding:10px;
- margin-bottom:15px;
- "
->
+  border:1px solid #ccc;
+  padding:15px;
+  margin-bottom:25px;
+  border-radius:8px;
+ ">
+
+<h3>手順 ${step.stepNo}</h3>
 
 <h4>
-手順 ${step.stepNo}
-：
 ${step.title || ""}
 </h4>
+`;
 
-<p>
-${step.description || ""}
-</p>
+      // =====================
+      // Snapshot画像
+      // =====================
 
-<p>
-開始：
-${step.startTime || ""}
-<br>
-終了：
-${step.endTime || ""}
-</p>
+      if(step.imageId){
+
+        output +=
+`
+<div style="margin:10px 0;">
+
+<img
+  src="${step.imageId}"
+  style="
+    max-width:500px;
+    width:100%;
+    border:1px solid #ccc;
+    border-radius:4px;
+  ">
 
 </div>
 `;
 
+      }
+
+      // =====================
+      // Snapshot時刻
+      // =====================
+
+      if(step.snapshotTime){
+
+        output +=
+`
+<p>
+<b>Snapshot：</b>
+${step.snapshotTime}
+</p>
+`;
+
+      }
+
+      output +=
+`
+<p>
+${step.description || ""}
+</p>
+
+<table
+ style="
+  width:100%;
+  border-collapse:collapse;
+ ">
+
+<tr>
+<th style="width:120px;text-align:left;">開始</th>
+<td>${step.startTime || ""}</td>
+</tr>
+
+<tr>
+<th style="text-align:left;">終了</th>
+<td>${step.endTime || ""}</td>
+</tr>
+
+<tr>
+<th style="text-align:left;">工具</th>
+<td>${step.tool || ""}</td>
+</tr>
+
+<tr>
+<th style="text-align:left;">部品</th>
+<td>${step.part || ""}</td>
+</tr>
+
+<tr>
+<th style="text-align:left;">危険</th>
+<td>${step.danger || ""}</td>
+</tr>
+
+<tr>
+<th style="text-align:left;">補足</th>
+<td>${step.note || ""}</td>
+</tr>
+
+</table>
+
+</div>
+`;
 
     });
 
+  }
+
+  // =====================
+  // 使用工具
+  // =====================
+
+  output += "<h2>使用工具</h2>";
+
+  if(Array.isArray(manual.tools) && manual.tools.length){
+
+    manual.tools.forEach(tool=>{
+
+      output += `<p>・${tool}</p>`;
+
+    });
+
+  }else{
+
+    output += "<p>なし</p>";
 
   }
 
+  // =====================
+  // 部品・材料
+  // =====================
+
+  output += "<h2>部品・材料</h2>";
+
+  if(Array.isArray(manual.parts) && manual.parts.length){
+
+    manual.parts.forEach(part=>{
+
+      output += `<p>・${part}</p>`;
+
+    });
+
+  }else{
+
+    output += "<p>なし</p>";
+
+  }
+
+  // =====================
+  // 注意事項
+  // =====================
+
+  output += "<h2>注意事項</h2>";
+
+  if(Array.isArray(manual.danger) && manual.danger.length){
+
+    manual.danger.forEach(item=>{
+
+      output += `<p>・${item}</p>`;
+
+    });
+
+  }else{
+
+    output += "<p>なし</p>";
+
+  }
+
+  // =====================
+  // 補足事項
+  // =====================
+
+  output +=
+`
+<h2>補足事項</h2>
+
+<p>
+${manual.notes || "なし"}
+</p>
+`;
+
+  // =====================
+  // チェックリスト
+  // =====================
+
+  output += "<h2>チェックリスト</h2>";
+
+  if(Array.isArray(manual.checklist) && manual.checklist.length){
+
+    manual.checklist.forEach(item=>{
+
+      output += `<p>☐ ${item}</p>`;
+
+    });
+
+  }else{
+
+    output += "<p>なし</p>";
+
+  }
 
   result.innerHTML =
     output;
-
 
 }
