@@ -722,8 +722,11 @@ document
 
 
 
-    response.results.response.results.forEach(item=>{
+    response.results.forEach(item=>{
 
+      if(typeof item.steps === "string"){
+        item.steps = JSON.parse(item.steps);
+      }
 
   output +=
 `
