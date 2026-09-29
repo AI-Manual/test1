@@ -524,6 +524,18 @@ ${step.note || ""}
 保存確認
 </button>
 
+<button
+  id="movieBtn"
+  type="button"
+  style="
+    padding:10px 30px;
+    font-size:16px;
+    margin-left:15px;
+    cursor:pointer;
+  ">
+説明動画作成
+</button>
+
 </div>
 `;
 
