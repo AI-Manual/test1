@@ -538,7 +538,7 @@ ${step.note || ""}
 
 document
 .getElementById("saveManualBtn")
-.addEventListener("click", ()=>{
+.addEventListener("click", async ()=>{
 
   const saveData = {
 
@@ -563,33 +563,29 @@ document
       .getElementById("manualNotes")
       ?.value || "",
 
+    checklist:
+      manual.checklist || [],
+
     steps:
       manual.steps.map(step=>{
 
         return {
 
-          stepNo:
-            step.stepNo,
+          ...step,
 
           title:
             document
             .getElementById(
-              "stepTitle" + step.stepNo
+              "stepTitle"+step.stepNo
             )
             .value,
 
           description:
             document
             .getElementById(
-              "stepDescription" + step.stepNo
+              "stepDescription"+step.stepNo
             )
-            .value,
-
-          imageId:
-            step.imageId,
-
-          snapshotTime:
-            step.snapshotTime
+            .value
 
         };
 
@@ -598,80 +594,58 @@ document
   };
 
 
-  const saveResponse =
-  await fetch(
+  try{
 
-    API_URL + "/api/save",
+    const res =
+      await fetch(
 
-    {
-
-      method:"POST",
-
-      headers:{
-
-        "Content-Type":
-          "application/json"
-
-      },
-
-      body:
-        JSON.stringify(saveData)
-
-    }
-
-  );
-
-
-const saveResult =
-  await saveResponse.json();
-
-
-console.log(
-  "保存結果",
-  saveResult
-);
-
-
-if(saveResult.success){
-
-  alert("保存しました");
-
-}else{
-
-  alert(
-    saveResult.message ||
-    "保存失敗"
-  );
-
-}
-
-
-});
-
-
-  } catch(error){
-
-
-    result.textContent =
-      JSON.stringify(
+        API_URL + "/api/save",
 
         {
 
-          success:false,
+          method:"POST",
 
-          message:error.message
+          headers:{
+            "Content-Type":"application/json"
+          },
 
-        },
+          body:
+            JSON.stringify({
 
-        null,
+              action:"updateResult",
 
-        2
+              data:saveData
+
+            })
+
+        }
 
       );
 
 
-  }
+    const response =
+      await res.json();
 
+
+    if(response.success){
+
+      alert("保存しました");
+
+    }else{
+
+      alert(
+        response.message ||
+        "保存失敗"
+      );
+
+    }
+
+
+  }catch(e){
+
+    alert(e.message);
+
+  }
 
 });
 
