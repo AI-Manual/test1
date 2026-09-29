@@ -51,34 +51,69 @@ if(request.method==="GET"){
 
   if(path==="/api/results"){
 
+  try{
 
     const gasUrl =
       env.GAS_API_URL +
       "?action=results";
 
-
     const gasResponse =
       await fetch(gasUrl);
 
-
-    const data =
-      await gasResponse.json();
-
+    const text =
+      await gasResponse.text();
 
     return new Response(
-  JSON.stringify(data),
-  {
-    headers:{
-      "Access-Control-Allow-Origin":"*",
-      "Access-Control-Allow-Methods":"GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers":"Content-Type",
-      "content-type":"application/json"
-    }
-  }
-);
+
+      text,
+
+      {
+
+        status:gasResponse.status,
+
+        headers:{
+
+          ...corsHeaders,
+
+          "content-type":"application/json"
+
+        }
+
+      }
+
+    );
+
+  }catch(e){
+
+    return new Response(
+
+      JSON.stringify({
+
+        success:false,
+
+        message:e.message
+
+      }),
+
+      {
+
+        status:500,
+
+        headers:{
+
+          ...corsHeaders,
+
+          "content-type":"application/json"
+
+        }
+
+      }
+
+    );
 
   }
 
+}
 
 
   // =========================
