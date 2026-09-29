@@ -117,6 +117,46 @@ if(request.method==="GET"){
 
 
   // =========================
+  // 説明動画作成
+  // =========================
+
+if(
+  request.method==="POST" &&
+  new URL(request.url).pathname==="/api/movie"
+){
+
+  const manual =
+    await request.json();
+
+  return new Response(
+
+    JSON.stringify({
+
+      success:true,
+
+      message:"movie api ready",
+
+      manual
+
+    }),
+
+    {
+
+      headers:{
+
+        ...corsHeaders,
+
+        "content-type":"application/json"
+
+      }
+
+    }
+
+  );
+
+}
+
+  // =========================
   // 通常GET確認
   // =========================
 
@@ -252,8 +292,8 @@ if(request.method==="GET"){
     }
 
     // =========================
-// 保存
-// =========================
+    // 保存
+    // =========================
 
 const url =
   new URL(request.url);
