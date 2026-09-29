@@ -678,57 +678,72 @@ document
 .getElementById("loadResultsBtn")
 .addEventListener("click", async ()=>{
 
-
   const result =
     document.getElementById("result");
-
 
   result.textContent =
     "読み込み中...";
 
-
   try{
-
 
     const res =
       await fetch(
-
         API_URL + "/api/results"
-
       );
-
 
     const response =
       await res.json();
 
-
-
     if(!response.success){
-
 
       result.textContent =
         response.message ||
         "取得失敗";
 
-
       return;
 
     }
 
-
-
     let output =
       "<h2>保存済みマニュアル一覧</h2>";
 
-
-
     response.results.forEach(item=>{
 
+      // =====================
+      // JSON文字列を元に戻す
+      // =====================
+
       if(typeof item.steps === "string"){
-        item.steps = JSON.parse(item.steps);
+        item.steps =
+          JSON.parse(item.steps || "[]");
       }
 
-  output +=
+      if(typeof item.tools === "string"){
+        item.tools =
+          JSON.parse(item.tools || "[]");
+      }
+
+      if(typeof item.parts === "string"){
+        item.parts =
+          JSON.parse(item.parts || "[]");
+      }
+
+      if(typeof item.danger === "string"){
+        item.danger =
+          JSON.parse(item.danger || "[]");
+      }
+
+      if(typeof item.checklist === "string"){
+        item.checklist =
+          JSON.parse(item.checklist || "[]");
+      }
+
+      if(typeof item.rawJson === "string"){
+        item.rawJson =
+          JSON.parse(item.rawJson || "{}");
+      }
+
+      output +=
 `
 <div
  style="
@@ -740,45 +755,35 @@ document
  onclick='showManualDetail(${JSON.stringify(item)})'
 >
 
-
 <h3>
 ${item.title || ""}
 </h3>
 
-
 <p>
 ${item.summary || ""}
 </p>
-
 
 <p>
 作成日時：
 ${item.createdAt || ""}
 </p>
 
-
 </div>
 `;
 
-});
+    });
 
     result.innerHTML =
       output;
 
-
-
   }catch(e){
-
 
     result.textContent =
       e.message;
 
-
   }
 
-
 });
-
 // =====================
 // 保存済みマニュアル詳細表示
 // =====================
