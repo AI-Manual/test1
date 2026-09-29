@@ -649,6 +649,27 @@ document
 
 });
 
+  } catch(error){
+
+  result.textContent =
+    JSON.stringify(
+
+      {
+
+        success:false,
+
+        message:error.message
+
+      },
+
+      null,
+
+      2
+
+    );
+
+}
+
 // =====================
 // 保存済みマニュアル一覧取得
 // =====================
