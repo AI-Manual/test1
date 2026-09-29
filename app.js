@@ -784,62 +784,106 @@ ${item.createdAt || ""}
   }
 
 });
-// =====================
-// 保存済みマニュアル詳細表示
-// =====================
-
-function showManualDetail(manual){
+function showManualEditor(manual){
 
   const result =
     document.getElementById("result");
 
-  let output =
-`
-<h2>${manual.title || ""}</h2>
+  // stepsが文字列なら配列へ戻す
+  if(typeof manual.steps === "string"){
+    manual.steps = JSON.parse(manual.steps);
+  }
 
-<p>
-${manual.summary || ""}
-</p>
+  // checklistが文字列なら配列へ戻す
+  if(typeof manual.checklist === "string"){
+    manual.checklist = JSON.parse(manual.checklist);
+  }
 
-<h3>作業手順</h3>
+  let output = "";
+
+  // =====================
+  // タイトル
+  // =====================
+
+  output += `
+<h2>タイトル</h2>
+
+<input
+  id="manualTitle"
+  type="text"
+  value="${manual.title || ""}"
+  style="
+    width:100%;
+    font-size:20px;
+    padding:8px;
+    box-sizing:border-box;
+  ">
+`;
+
+  // =====================
+  // 概要
+  // =====================
+
+  output += `
+<h2>概要</h2>
+
+<textarea
+  id="manualSummary"
+  style="
+    width:100%;
+    height:120px;
+    padding:8px;
+    box-sizing:border-box;
+  "
+>${manual.summary || ""}</textarea>
+`;
+
+  // =====================
+  // 手順
+  // =====================
+
+  output += `
+<h2>作業手順</h2>
 `;
 
   if(Array.isArray(manual.steps)){
 
     manual.steps.forEach(step=>{
 
-      output +=
-`
+      output += `
 <div
- style="
-  border:1px solid #ccc;
-  padding:15px;
-  margin-bottom:25px;
-  border-radius:8px;
- ">
+  style="
+    border:1px solid #ccc;
+    padding:15px;
+    margin-bottom:25px;
+    border-radius:8px;
+  ">
 
 <h3>手順 ${step.stepNo}</h3>
 
-<h4>
-${step.title || ""}
-</h4>
+<input
+  id="stepTitle${step.stepNo}"
+  type="text"
+  value="${step.title || ""}"
+  style="
+    width:100%;
+    font-size:18px;
+    padding:8px;
+    box-sizing:border-box;
+    margin-bottom:10px;
+  ">
 `;
-
-      // =====================
-      // Snapshot画像
-      // =====================
 
       if(step.imageId){
 
-        output +=
-`
+        output += `
 <div style="margin:10px 0;">
 
 <img
   src="${step.imageId}"
   style="
-    max-width:500px;
     width:100%;
+    max-width:500px;
     border:1px solid #ccc;
     border-radius:4px;
   ">
@@ -849,33 +893,37 @@ ${step.title || ""}
 
       }
 
-      // =====================
-      // Snapshot時刻
-      // =====================
-
       if(step.snapshotTime){
 
-        output +=
-`
+        output += `
 <p>
+
 <b>Snapshot：</b>
+
 ${step.snapshotTime}
+
 </p>
 `;
 
       }
 
-      output +=
-`
-<p>
-${step.description || ""}
-</p>
+      output += `
+<textarea
+  id="stepDescription${step.stepNo}"
+  style="
+    width:100%;
+    height:120px;
+    padding:8px;
+    box-sizing:border-box;
+  "
+>${step.description || ""}</textarea>
 
 <table
- style="
-  width:100%;
-  border-collapse:collapse;
- ">
+  style="
+    width:100%;
+    margin-top:10px;
+    border-collapse:collapse;
+  ">
 
 <tr>
 <th style="width:120px;text-align:left;">開始</th>
@@ -888,13 +936,13 @@ ${step.description || ""}
 </tr>
 
 <tr>
-<th style="text-align:left;">工具</th>
-<td>${step.tool || ""}</td>
+<th style="text-align:left;">部品</th>
+<td>${step.part || ""}</td>
 </tr>
 
 <tr>
-<th style="text-align:left;">部品</th>
-<td>${step.part || ""}</td>
+<th style="text-align:left;">工具</th>
+<td>${step.tool || ""}</td>
 </tr>
 
 <tr>
@@ -920,19 +968,29 @@ ${step.description || ""}
   // 使用工具
   // =====================
 
-  output += "<h2>使用工具</h2>";
+  output += `
+<h2>使用工具</h2>
+`;
 
-  if(Array.isArray(manual.tools) && manual.tools.length){
+  if(Array.isArray(manual.tools)){
 
-    manual.tools.forEach(tool=>{
+    if(manual.tools.length){
 
-      output += `<p>・${tool}</p>`;
+      manual.tools.forEach(tool=>{
 
-    });
+        output += `
+<p>・${tool}</p>
+`;
 
-  }else{
+      });
 
-    output += "<p>なし</p>";
+    }else{
+
+      output += `
+<p>なし</p>
+`;
+
+    }
 
   }
 
@@ -940,19 +998,29 @@ ${step.description || ""}
   // 部品・材料
   // =====================
 
-  output += "<h2>部品・材料</h2>";
+  output += `
+<h2>部品・材料</h2>
+`;
 
-  if(Array.isArray(manual.parts) && manual.parts.length){
+  if(Array.isArray(manual.parts)){
 
-    manual.parts.forEach(part=>{
+    if(manual.parts.length){
 
-      output += `<p>・${part}</p>`;
+      manual.parts.forEach(part=>{
 
-    });
+        output += `
+<p>・${part}</p>
+`;
 
-  }else{
+      });
 
-    output += "<p>なし</p>";
+    }else{
+
+      output += `
+<p>なし</p>
+`;
+
+    }
 
   }
 
@@ -960,19 +1028,29 @@ ${step.description || ""}
   // 注意事項
   // =====================
 
-  output += "<h2>注意事項</h2>";
+  output += `
+<h2>注意事項</h2>
+`;
 
-  if(Array.isArray(manual.danger) && manual.danger.length){
+  if(Array.isArray(manual.danger)){
 
-    manual.danger.forEach(item=>{
+    if(manual.danger.length){
 
-      output += `<p>・${item}</p>`;
+      manual.danger.forEach(danger=>{
 
-    });
+        output += `
+<p>・${danger}</p>
+`;
 
-  }else{
+      });
 
-    output += "<p>なし</p>";
+    }else{
+
+      output += `
+<p>なし</p>
+`;
+
+    }
 
   }
 
@@ -980,36 +1058,188 @@ ${step.description || ""}
   // 補足事項
   // =====================
 
-  output +=
-`
+  output += `
 <h2>補足事項</h2>
 
-<p>
-${manual.notes || "なし"}
-</p>
+<textarea
+  id="manualNotes"
+  style="
+    width:100%;
+    height:120px;
+    padding:8px;
+    box-sizing:border-box;
+  "
+>${manual.notes || ""}</textarea>
 `;
 
   // =====================
   // チェックリスト
   // =====================
 
-  output += "<h2>チェックリスト</h2>";
+  output += `
+<h2>チェックリスト</h2>
+`;
 
-  if(Array.isArray(manual.checklist) && manual.checklist.length){
+  if(Array.isArray(manual.checklist)){
 
-    manual.checklist.forEach(item=>{
+    if(manual.checklist.length){
 
-      output += `<p>☐ ${item}</p>`;
+      manual.checklist.forEach(item=>{
 
-    });
+        output += `
+<p>☐ ${item}</p>
+`;
 
-  }else{
+      });
 
-    output += "<p>なし</p>";
+    }else{
+
+      output += `
+<p>なし</p>
+`;
+
+    }
 
   }
 
-  result.innerHTML =
-    output;
+  // =====================
+  // 更新ボタン
+  // =====================
+
+  output += `
+<div
+  style="
+    margin-top:30px;
+    text-align:center;
+  ">
+
+<button
+  id="updateManualBtn"
+  type="button"
+  style="
+    padding:10px 30px;
+    font-size:16px;
+    cursor:pointer;
+  ">
+更新保存
+</button>
+
+</div>
+`;
+
+  result.innerHTML = output;
+
+  // =====================
+  // 更新保存
+  // =====================
+
+  document
+  .getElementById("updateManualBtn")
+  .addEventListener("click", async ()=>{
+
+    const saveData = {
+
+      aiResultId:
+        manual.aiResultId,
+
+      createdAt:
+        manual.createdAt,
+
+      title:
+        document
+        .getElementById("manualTitle")
+        .value,
+
+      summary:
+        document
+        .getElementById("manualSummary")
+        .value,
+
+      notes:
+        document
+        .getElementById("manualNotes")
+        ?.value || "",
+
+      tools:
+        manual.tools || [],
+
+      parts:
+        manual.parts || [],
+
+      danger:
+        manual.danger || [],
+
+      checklist:
+        manual.checklist || [],
+
+      steps:
+
+        manual.steps.map(step=>({
+
+          ...step,
+
+          title:
+            document
+            .getElementById(
+              "stepTitle"+step.stepNo
+            )
+            .value,
+
+          description:
+            document
+            .getElementById(
+              "stepDescription"+step.stepNo
+            )
+            .value
+
+        }))
+
+    };
+
+    try{
+
+      const res =
+        await fetch(
+
+          API_URL + "/api/save",
+
+          {
+
+            method:"POST",
+
+            headers:{
+              "Content-Type":"application/json"
+            },
+
+            body:
+              JSON.stringify(saveData)
+
+          }
+
+        );
+
+      const response =
+        await res.json();
+
+      if(response.success){
+
+        alert("更新しました");
+
+      }else{
+
+        alert(
+          response.message ||
+          "更新失敗"
+        );
+
+      }
+
+    }catch(e){
+
+      alert(e.message);
+
+    }
+
+  });
 
 }
