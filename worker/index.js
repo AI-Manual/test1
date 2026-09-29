@@ -216,6 +216,67 @@ if(request.method==="GET"){
 
     }
 
+    // =========================
+// 保存
+// =========================
+
+const url =
+  new URL(request.url);
+
+const path =
+  url.pathname;
+
+if(path==="/api/save"){
+
+  const data =
+    await request.json();
+
+  const gasResponse =
+    await fetch(
+
+      env.GAS_API_URL,
+
+      {
+
+        method:"POST",
+
+        headers:{
+
+          "Content-Type":
+            "application/json"
+
+        },
+
+        body:
+          JSON.stringify(data)
+
+      }
+
+    );
+
+  const result =
+    await gasResponse.json();
+
+  return new Response(
+
+    JSON.stringify(result),
+
+    {
+
+      headers:{
+
+        ...corsHeaders,
+
+        "content-type":
+          "application/json"
+
+      }
+
+    }
+
+  );
+
+}
 
 
     // =========================
